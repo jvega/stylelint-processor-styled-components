@@ -16,6 +16,7 @@ const isStylelintComment = require('../utils/general').isStylelintComment
 const getTTLContent = require('../utils/tagged-template-literal.js').getTaggedTemplateLiteralContent
 const parseImports = require('../utils/parse').parseImports
 const getSourceMap = require('../utils/parse').getSourceMap
+const getSyntax = require('../utils/get-syntax')
 
 const processStyledComponentsFile = (ast, absolutePath, options) => {
   const extractedCSS = []
@@ -106,9 +107,14 @@ const processStyledComponentsFile = (ast, absolutePath, options) => {
 }
 
 module.exports = (input, absolutePath, options) => {
-  const typedParser = absolutePath.endsWith('.ts') || absolutePath.endsWith('.tsx')
-    ? 'typescript'
-    : 'flow'
-  const ast = estreeParse(typedParser, options.parserPlugins)(input)
-  return processStyledComponentsFile(ast, absolutePath, options)
+  const syntax = getSyntax(absolutePath, input)
+  if (syntax === 'jsx') {
+    const typedParser = absolutePath.endsWith('.ts') || absolutePath.endsWith('.tsx')
+      ? 'typescript'
+      : 'flow'
+    const ast = estreeParse(typedParser, options.parserPlugins)(input)
+    return processStyledComponentsFile(ast, absolutePath, options)
+  } else {
+    return { extractedCSS: input }
+  }
 }

@@ -38,7 +38,7 @@ module.exports = options => ({
 
     try {
       sourceMapsCorrections[absolutePath] = {}
-      const { extractedCSS, interpolationLines, sourceMap } = parse(
+      const { extractedCSS, interpolationLines = [], sourceMap = {} } = parse(
         input,
         absolutePath,
         Object.assign({}, DEFAULT_OPTIONS, options)
